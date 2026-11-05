@@ -10,10 +10,6 @@ export const db = mysql.createPool({
     rejectUnauthorized: false,
   },
   waitForConnections: true,
-  connectionLimit: 10,
-  maxIdle: 10, // Maksimal koneksi idle yang disimpan
-  idleTimeout: 60000, // Tutup koneksi idle setelah 60 detik
+  connectionLimit: 5, // Dibatasi untuk serverless agar tidak overload
   queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 10000, // Kirim TCP keep-alive tiap 10 detik agar koneksi Aiven tidak timeout
 });

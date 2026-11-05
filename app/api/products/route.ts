@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 
 // 1. GET SEMUA PRODUK (Katalog Admin)
 export async function GET() {
@@ -135,7 +134,7 @@ export async function POST(request: Request) {
         ? basePrice - basePrice * (discountPercent / 100)
         : null;
 
-    // A. Insert ke tabel products (menyertakan slug dan gender_target yang sudah dimapping)[cite: 1]
+    // A. Insert ke tabel products (menyertakan slug dan gender_target yang sudah dimapping)
     const [productResult]: any = await db.query(
       `INSERT INTO products (name, slug, sku_base, description, category_id, gender_target, base_price, discount_percent, discount_price, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -154,7 +153,7 @@ export async function POST(request: Request) {
 
     const productId = productResult.insertId;
 
-    // B. Insert stok awal ke tabel product_variants[cite: 1]
+    // B. Insert stok awal ke tabel product_variants
     const skuVariant = `${skuBase}-VAR1`;
     await db.query(
       `INSERT INTO product_variants (product_id, sku_variant, color_name, price, stock_quantity, is_active) VALUES (?, ?, ?, ?, ?, 1)`,
@@ -167,20 +166,20 @@ export async function POST(request: Request) {
       ],
     );
 
-    // C. Upload dan simpan gambar utama (Jika ada)[cite: 1]
+    // C. Upload gambar ke Vercel Blob Storage (Jika ada file yang diunggah)
     if (file && typeof file === "object" && file.name) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const uploadDir = path.join(process.cwd(), "public/uploads/products");
-      await mkdir(uploadDir, { recursive: true });
+      const ext = file.name.substring(file.name.lastIndexOf(".")) || ".webp";
+      const fileName = `products/idv_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`;
 
-      const ext = path.extname(file.name) || ".webp";
-      const fileName = `idv_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`;
-      await writeFile(path.join(uploadDir, fileName), buffer);
+      // Mengunggah file langsung menggunakan Vercel Blob
+      const blob = await put(fileName, file, {
+        access: "public",
+      });
 
+      // Simpan URL publik dari Vercel Blob ke database Aiven
       await db.query(
         "INSERT INTO product_images (product_id, image_path, is_primary) VALUES (?, ?, 1)",
-        [productId, fileName],
+        [productId, blob.url],
       );
     }
 

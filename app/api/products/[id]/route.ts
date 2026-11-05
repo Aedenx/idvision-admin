@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 
 // 1. GET DETAIL PRODUK (Untuk Preview & Edit)
 export async function GET(
@@ -66,7 +65,7 @@ export async function GET(
   }
 }
 
-// 2. PUT / UPDATE PRODUK (DIOPTIMALKAN AGAR BISA DI-EDIT BERKALI-KALI)
+// 2. PUT / UPDATE PRODUK (DIOPTIMALKAN DENGAN VERCEL BLOB)
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -120,13 +119,11 @@ export async function PUT(
     );
 
     if (existingVariant.length > 0) {
-      // Jika varian sudah ada, update stok dan harganya tanpa mengubah SKU dasar yang sudah unik
       await db.query(
         `UPDATE product_variants SET stock_quantity = ?, price = ? WHERE product_id = ?`,
         [stockQuantity, discountPrice || basePrice, id],
       );
     } else {
-      // Jika belum ada, buatkan baru dengan SKU unik berbasis timestamp/rand agar tidak duplikat
       const skuVariant = `${skuBase}-${Date.now().toString().slice(-4)}`;
       await db.query(
         `INSERT INTO product_variants (product_id, sku_variant, color_name, price, stock_quantity, is_active) VALUES (?, ?, 'Standard', ?, ?, 1)`,
@@ -134,16 +131,15 @@ export async function PUT(
       );
     }
 
-    // C. Proses Upload Gambar Baru (Jika ada)
+    // C. Proses Upload Gambar Baru ke Vercel Blob Storage (Jika ada)
     if (file && typeof file === "object" && file.name) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const uploadDir = path.join(process.cwd(), "public/uploads/products");
-      await mkdir(uploadDir, { recursive: true });
+      const ext = file.name.substring(file.name.lastIndexOf(".")) || ".webp";
+      const fileName = `products/idv_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`;
 
-      const ext = path.extname(file.name) || ".webp";
-      const fileName = `idv_${Date.now()}_${Math.random().toString(36).substring(2, 8)}${ext}`;
-      await writeFile(path.join(uploadDir, fileName), buffer);
+      // Upload langsung ke Vercel Blob
+      const blob = await put(fileName, file, {
+        access: "public",
+      });
 
       const [existingImg]: any = await db.query(
         "SELECT * FROM product_images WHERE product_id = ? AND is_primary = 1",
@@ -152,12 +148,12 @@ export async function PUT(
       if (existingImg.length > 0) {
         await db.query(
           "UPDATE product_images SET image_path = ? WHERE product_id = ? AND is_primary = 1",
-          [fileName, id],
+          [blob.url, id],
         );
       } else {
         await db.query(
           "INSERT INTO product_images (product_id, image_path, is_primary) VALUES (?, ?, 1)",
-          [id, fileName],
+          [id, blob.url],
         );
       }
     }

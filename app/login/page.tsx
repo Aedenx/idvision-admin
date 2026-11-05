@@ -283,7 +283,7 @@ export default function LoginPage() {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
               <img
-                src="/logo-login.png"
+                src="/logo-login.jpg"
                 alt="IDVISIONSTORE Logo"
                 className="w-15 h-15 object-contain rounded-lg"
               />

@@ -1,10 +1,10 @@
 import { db } from "@/lib/db";
 import { Suspense } from "react";
-
-// TAMBAHKAN BARIS INI AGAR HALAMAN BERSIFAT DINAMIS PADA SAAT REQUEST
-export const dynamic = "force-dynamic";
+import { connection } from "next/server"; // TAMBAHKAN IMPORT INI
 
 async function DashboardMetrics() {
+  await connection(); // PANGGIL INI AGAR HALAMAN BERSIFAT DINAMIS SAAT REQUEST
+
   let totalSales = 0;
   let totalClients = 0;
   let totalProducts = 0;

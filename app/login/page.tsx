@@ -251,13 +251,13 @@ export default function LoginPage() {
 
       {/* Main Container Card (Split 2 Kolom) */}
       <div className="relative z-10 w-full max-w-4xl bg-gray-900/80 border border-gray-800 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl grid grid-cols-1 md:grid-cols-2">
-        {/* Kolom Kiri: Banner Gambar dari Folder Upload / Public */}
+        {/* Kolom Kiri: Banner Gambar dari Folder Public */}
         <div className="relative hidden md:flex flex-col justify-end p-10 overflow-hidden border-r border-gray-800/80">
           {/* Gambar Background Banner */}
           <div
             className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
             style={{
-              backgroundImage: `url('http://localhost/idvisionstore.web.idstore.web.id/glasses-store-admin/public/login.jpg')`,
+              backgroundImage: "url('/login.jpg')",
             }}
           ></div>
 
@@ -271,8 +271,7 @@ export default function LoginPage() {
             </h2>
             <p className="text-gray-300 text-xs leading-relaxed">
               Infrastruktur terpadu untuk pengawasan inventaris kacamata,
-              analisis transaksi, dan kontrol operasional
-              idvisionstore.web.idstore.web.id.
+              analisis transaksi, dan kontrol operasional idvisionstore.web.id.
             </p>
           </div>
         </div>
@@ -283,9 +282,9 @@ export default function LoginPage() {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
               <img
-                src="/logo-login.jpg"
+                src="/logo-login.png"
                 alt="IDVISIONSTORE Logo"
-                className="w-15 h-15 object-contain rounded-lg"
+                className="w-12 h-12 object-contain rounded-lg"
               />
               <div className="flex flex-col">
                 <span className="text-xl font-extrabold tracking-wider text-white">
@@ -311,7 +310,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="admin@idvisionstore.web.id.com"
+                placeholder="admin@idvisionstore.web.id"
                 className="w-full bg-gray-950/80 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
               />
             </div>
@@ -336,7 +335,6 @@ export default function LoginPage() {
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    // Ikon Mata Terbuka (Hide Password)
                     <svg
                       className="w-5 h-5"
                       fill="none"
@@ -351,7 +349,6 @@ export default function LoginPage() {
                       />
                     </svg>
                   ) : (
-                    // Ikon Mata Tertutup (Show Password)
                     <svg
                       className="w-5 h-5"
                       fill="none"
@@ -379,7 +376,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3.5 bg-black-600 hover:bg-black-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-white-950/40 transition-all duration-200 disabled:opacity-50 active:scale-[0.99] flex items-center justify-center gap-2"
+              className="w-full mt-2 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-blue-950/40 transition-all duration-200 disabled:opacity-50 active:scale-[0.99] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

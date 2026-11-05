@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import { Suspense } from "react";
 
+// TAMBAHKAN BARIS INI AGAR HALAMAN BERSIFAT DINAMIS PADA SAAT REQUEST
+export const dynamic = "force-dynamic";
+
 async function DashboardMetrics() {
   let totalSales = 0;
   let totalClients = 0;
